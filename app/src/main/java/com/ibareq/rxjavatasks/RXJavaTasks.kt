@@ -17,7 +17,8 @@ object RXJavaTasks {
      * let it emit characters form A to Z each 1 second
      */
     fun task1(): Observable<String> {
-        return Observable.
+        return Observable.range(0, 'Z' - 'A' + 1)
+            .map {l ->  ('A' + l).toString()}.zipWith(Observable.interval(1, TimeUnit.SECONDS), {item, _ -> item})
     }
 
     /**
@@ -26,7 +27,7 @@ object RXJavaTasks {
      */
     fun task2(): Observable<String> {
         val mList = listOf("A", "B", "C", "C", "D", "B", "E")
-        return Observable.fromIterable(mList)
+        return Observable.fromIterable(mList).distinct()
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
 
@@ -45,7 +46,7 @@ object RXJavaTasks {
      * add the required operators to emit data from 21 to 80 only
      */
     fun task4(): Observable<Int> {
-        return Observable.range(1,100)
+        return Observable.range(1,100).skipWhile { it != 21 }.takeWhile { it != 81 }
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
 
@@ -56,7 +57,12 @@ object RXJavaTasks {
         val firstObservable = Observable.just("A", "B", "C", "D", "E").zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
         val secondObservable = Observable.range(1,5).zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
 
-        return Observable.
+        return Observable.zip(firstObservable,secondObservable, {first, second -> "$first$second"})
     }
 
+}
+
+private fun Observable<String>.mergeWith(secondObservable: Observable<Int>?): Observable<String> {
+    val source2 = secondObservable?.map { it.toString() }
+    return Observable.merge(this, source2)
 }
