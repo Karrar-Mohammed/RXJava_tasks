@@ -37,7 +37,7 @@ object RXJavaTasks {
      */
     fun task3(): Observable<String> {
         val firstObservable = Observable.just("A", "B", "C", "D", "E")
-        val secondObservable = Observable.range(1,5)
+        val secondObservable = Observable.range(1,5).map { it.toString() }
         return firstObservable.mergeWith(secondObservable)
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
@@ -60,9 +60,4 @@ object RXJavaTasks {
         return Observable.zip(firstObservable,secondObservable, {first, second -> "$first$second"})
     }
 
-}
-
-private fun Observable<String>.mergeWith(secondObservable: Observable<Int>?): Observable<String> {
-    val source2 = secondObservable?.map { it.toString() }
-    return Observable.merge(this, source2)
 }
